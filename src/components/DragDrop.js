@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useDrop } from 'react-dnd'
 import Picture from './Picture'
 
-const Picturelist = [
+const pics = [
   {
     id: 1,
     url: "https://www.rainforest-alliance.org/wp-content/uploads/2021/06/capybara-square-1.jpg.optimal.jpg"
@@ -28,13 +28,14 @@ function DragDrop() {
   }))
 
   const addImageToBoard = (id) => {
-    const picList = Picturelist.filter((pic) => id === pic.id)
-    setBoard((board) => [...board, picList[0]])
+    const pic = pics.find((pic) => id === pic.id)
+
+    setBoard((board) => [...board, pic])
   }
 
   return (
     <>
-      <div className='Pictures'>{Picturelist.map((pic) => {
+      <div className='Pictures'>{pics.map((pic) => {
         return <Picture url={pic.url} id={pic.id} />
       })}</div>
       <div className='Board' ref={drop}>
