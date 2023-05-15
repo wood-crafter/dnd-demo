@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { useDrop } from 'react-dnd'
 import Picture from './Picture'
 
-const Picturelist = [
+const pics = [
   {
     id: 1,
     url: "https://www.rainforest-alliance.org/wp-content/uploads/2021/06/capybara-square-1.jpg.optimal.jpg"
@@ -18,8 +18,9 @@ const Picturelist = [
 ]
 
 function DragDrop() {
-  const [board, setBoard] = useState([])
-  const [{isOver}, drop] = useDrop(() => ({
+  const [readyPics, setReadyPics] = useState(pics)
+  const [boardPics, setBoardPics] = useState([])
+  const [, drop] = useDrop(() => ({
     accept: 'pic',
     drop: (item) => addImageToBoard(item.id),
     collect: (monitor) => ({
@@ -28,18 +29,39 @@ function DragDrop() {
   }))
 
   const addImageToBoard = (id) => {
-    const picList = Picturelist.filter((pic) => id === pic.id)
-    setBoard((board) => [...board, picList[0]])
+    const pic = pics.find((pic) => id === pic.id)
+
+    setBoardPics((board) => [...new Set([...board, pic])])
+    setReadyPics(pics => pics.filter(pic => pic.id !== id))
+  }
+
+  const handleSwapPics = (pic1Id, pic2Id) => {
+    const pic1Index = readyPics.findIndex(pic => pic.id === pic1Id)
+    const pic2Index = readyPics.findIndex(pic => pic.id === pic2Id)
+
+    setReadyPics(readyPics => {
+      const nextReadyPics = [...readyPics]
+
+      // FIXME: Can only work within ready pics
+      if (readyPics[pic1Index] && readyPics[pic2Index]) {
+        nextReadyPics[pic2Index] = readyPics[pic1Index]
+        nextReadyPics[pic1Index] = readyPics[pic2Index]
+      }
+
+      return nextReadyPics
+    })
   }
 
   return (
     <>
-      <div className='Pictures'>{Picturelist.map((pic) => {
-        return <Picture url={pic.url} id={pic.id} />
-      })}</div>
+      <div className='Pictures'>
+        {readyPics.map((pic) => {
+          return <Picture key={pic.id} url={pic.url} id={pic.id} onSwapPics={handleSwapPics} />
+        })}
+      </div>
       <div className='Board' ref={drop}>
-        {board.map((pic) => {
-          return <Picture url={pic.url} id={pic.id} />
+        {boardPics.map((pic) => {
+          return <Picture key={pic.id} url={pic.url} id={pic.id} />
         })}
       </div>
     </>
