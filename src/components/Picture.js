@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
 
 function Picture({ id, url, onSwapPics }) {
@@ -12,7 +12,11 @@ function Picture({ id, url, onSwapPics }) {
   const [, dropRef] = useDrop(() => ({
     accept: "pic",
     item: { id },
-    drop: (item) => onSwapPics?.(item.id, id),
+    drop: (item, monitor) => {
+      console.info(monitor.getInitialSourceClientOffset())
+      console.info(monitor.getSourceClientOffset())
+      return onSwapPics?.(item.id, id)
+    },
   }))
 
   return (

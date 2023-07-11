@@ -22,9 +22,33 @@ function DragDrop() {
   const [boardPics, setBoardPics] = useState([])
   const [, drop] = useDrop(() => ({
     accept: 'pic',
-    drop: (item) => addImageToBoard(item.id),
+    drop: (item, monitor) => {
+      const didDrop = monitor.didDrop()
+      if (didDrop) {
+        return
+      }
+      console.info('say one')
+      addImageToBoard(item.id)
+    },
     collect: (monitor) => ({
-      isOver: !!monitor.isOver(),
+      isOver: monitor.isOver(),
+      isOverCurrent: monitor.isOver({ shallow: true }),
+    }),
+  }))
+
+  const [, notBoardDrop] = useDrop(() => ({
+    accept: 'pic',
+    drop: (item, monitor) => {
+      const didDrop = monitor.didDrop()
+      if (didDrop) {
+        return
+      }
+      console.info('say two')
+      addImageToBoard(item.id)
+    },
+    collect: (monitor) => ({
+      isOver: monitor.isOver(),
+      isOverCurrent: monitor.isOver({ shallow: true }),
     }),
   }))
 
@@ -60,6 +84,7 @@ function DragDrop() {
         })}
       </div>
       <div className='Board' ref={drop}>
+        <div style={{width: '200px', height: '200px', border: '1px solid black'}} ref={notBoardDrop}></div>
         {boardPics.map((pic) => {
           return <Picture key={pic.id} url={pic.url} id={pic.id} />
         })}
